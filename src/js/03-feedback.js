@@ -23,15 +23,16 @@ const data = {
 };
 
 checkStorage();
+checkEnteredData();
 
-formEl.addEventListener('input', onInputChange);
+formEl.addEventListener('input', throttle(onInputChange, 500));
 formEl.addEventListener('submit', onFormSubmit);
 
 function onInputChange(event) {
   const value = event.target.value;
   const name = event.target.name;
   data[name] = value;
-  throttle(saveData(data), 500);
+  saveData(data);
 }
 
 function saveData(data) {
@@ -51,14 +52,28 @@ function onFormSubmit(event) {
   localStorage.removeItem(KEY_FORM_DATA);
 
   formEl.reset();
+
+  data.message = '';
+  data.email = '';
 }
 
 function checkStorage() {
   const parsedFormData = JSON.parse(localStorage.getItem(KEY_FORM_DATA));
 
   if (parsedFormData) {
+    data.email = '';
+    data.message = '';
     messageEl.value = parsedFormData.message;
     emailEl.value = parsedFormData.email;
     return parsedFormData;
+  }
+}
+
+function checkEnteredData() {
+  if (messageEl.value) {
+    data.message = messageEl.value;
+  }
+  if (emailEl.value) {
+    data.email = emailEl.value;
   }
 }
